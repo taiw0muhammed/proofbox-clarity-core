@@ -16,6 +16,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ProofboxesIndexRouteImport } from './routes/proofboxes.index'
 import { Route as ProofboxesIdRouteImport } from './routes/proofboxes.$id'
 import { Route as ProofboxesCreateRouteImport } from './routes/proofboxes.create'
+import { Route as ProofboxesIdIndexRouteImport } from './routes/proofboxes.$id.index'
 import { Route as ProofboxesIdConfirmRouteImport } from './routes/proofboxes.$id.confirm'
 import { Route as ProofboxesIdConfirmedRouteImport } from './routes/proofboxes.$id.confirmed'
 
@@ -54,6 +55,11 @@ const ProofboxesCreateRoute = ProofboxesCreateRouteImport.update({
   path: '/proofboxes/create',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProofboxesIdIndexRoute = ProofboxesIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProofboxesIdRoute,
+} as any)
 const ProofboxesIdConfirmRoute = ProofboxesIdConfirmRouteImport.update({
   id: '/confirm',
   path: '/confirm',
@@ -75,17 +81,18 @@ export interface FileRoutesByFullPath {
   '/proofboxes/': typeof ProofboxesIndexRoute
   '/proofboxes/$id/confirm': typeof ProofboxesIdConfirmRoute
   '/proofboxes/$id/confirmed': typeof ProofboxesIdConfirmedRoute
+  '/proofboxes/$id/': typeof ProofboxesIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/notifications': typeof NotificationsRoute
   '/settings': typeof SettingsRoute
-  '/proofboxes/$id': typeof ProofboxesIdRouteWithChildren
   '/proofboxes/create': typeof ProofboxesCreateRoute
   '/proofboxes': typeof ProofboxesIndexRoute
   '/proofboxes/$id/confirm': typeof ProofboxesIdConfirmRoute
   '/proofboxes/$id/confirmed': typeof ProofboxesIdConfirmedRoute
+  '/proofboxes/$id': typeof ProofboxesIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +105,7 @@ export interface FileRoutesById {
   '/proofboxes/': typeof ProofboxesIndexRoute
   '/proofboxes/$id/confirm': typeof ProofboxesIdConfirmRoute
   '/proofboxes/$id/confirmed': typeof ProofboxesIdConfirmedRoute
+  '/proofboxes/$id/': typeof ProofboxesIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,17 +119,18 @@ export interface FileRouteTypes {
     | '/proofboxes/'
     | '/proofboxes/$id/confirm'
     | '/proofboxes/$id/confirmed'
+    | '/proofboxes/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard'
     | '/notifications'
     | '/settings'
-    | '/proofboxes/$id'
     | '/proofboxes/create'
     | '/proofboxes'
     | '/proofboxes/$id/confirm'
     | '/proofboxes/$id/confirmed'
+    | '/proofboxes/$id'
   id:
     | '__root__'
     | '/'
@@ -133,6 +142,7 @@ export interface FileRouteTypes {
     | '/proofboxes/'
     | '/proofboxes/$id/confirm'
     | '/proofboxes/$id/confirmed'
+    | '/proofboxes/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -196,6 +206,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProofboxesCreateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/proofboxes/$id/': {
+      id: '/proofboxes/$id/'
+      path: '/'
+      fullPath: '/proofboxes/$id/'
+      preLoaderRoute: typeof ProofboxesIdIndexRouteImport
+      parentRoute: typeof ProofboxesIdRoute
+    }
     '/proofboxes/$id/confirm': {
       id: '/proofboxes/$id/confirm'
       path: '/confirm'
@@ -216,11 +233,13 @@ declare module '@tanstack/react-router' {
 interface ProofboxesIdRouteChildren {
   ProofboxesIdConfirmRoute: typeof ProofboxesIdConfirmRoute
   ProofboxesIdConfirmedRoute: typeof ProofboxesIdConfirmedRoute
+  ProofboxesIdIndexRoute: typeof ProofboxesIdIndexRoute
 }
 
 const ProofboxesIdRouteChildren: ProofboxesIdRouteChildren = {
   ProofboxesIdConfirmRoute: ProofboxesIdConfirmRoute,
   ProofboxesIdConfirmedRoute: ProofboxesIdConfirmedRoute,
+  ProofboxesIdIndexRoute: ProofboxesIdIndexRoute,
 }
 
 const ProofboxesIdRouteWithChildren = ProofboxesIdRoute._addFileChildren(
