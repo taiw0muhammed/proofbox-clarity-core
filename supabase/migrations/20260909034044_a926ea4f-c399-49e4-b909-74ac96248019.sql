@@ -1,0 +1,13 @@
+REVOKE ALL ON FUNCTION public.can_access_box(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.is_box_creator(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.shares_box_with(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.notify_box_participants(uuid, text, text, text, uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.on_amendment_created() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.on_evidence_added() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.on_participant_confirmed() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.claim_invitation(uuid) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.invite_participant(uuid, text, text, text) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.verify_proof_box(text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.claim_invitation(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.invite_participant(uuid, text, text, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.verify_proof_box(text) TO anon, authenticated;
