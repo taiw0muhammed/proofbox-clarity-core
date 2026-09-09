@@ -1,7 +1,17 @@
-export type ProofBoxStatus = "Active" | "Awaiting confirmation" | "Due soon" | "Completed" | "Disputed";
+export type ProofBoxStatus =
+  | "Draft"
+  | "Awaiting confirmation"
+  | "Active"
+  | "Due soon"
+  | "Overdue"
+  | "Completed"
+  | "Disputed";
+
+export type DbStatus = "draft" | "awaiting_confirmation" | "confirmed" | "completed" | "disputed";
 
 export type ProofBoxRecord = {
   id: string;
+  code: string;
   title: string;
   type: string;
   participant: string;
@@ -9,28 +19,81 @@ export type ProofBoxRecord = {
   value: string;
   status: ProofBoxStatus;
   due: string;
-  icon: "camera" | "palette" | "laptop" | "phone" | "truck" | "payment";
+  icon: string;
 };
 
-export const records: ProofBoxRecord[] = [
-  { id: "camera-borrow", title: "Camera Borrow", type: "Borrow", participant: "Ahmed Bello", date: "Sep 7, 2026", value: "₦500,000 item value", status: "Awaiting confirmation", due: "Sep 15", icon: "camera" },
-  { id: "logo-design", title: "Logo Design", type: "Service", participant: "Ada Creative", date: "Sep 4, 2026", value: "₦40,000 · ₦20,000 paid", status: "Due soon", due: "Sep 12", icon: "palette" },
-  { id: "laptop-rental", title: "Laptop Rental", type: "Rental", participant: "Tunde Lawal", date: "Aug 28, 2026", value: "₦85,000", status: "Active", due: "Sep 30", icon: "laptop" },
-  { id: "phone-sale", title: "Phone Sale", type: "Sale", participant: "Zainab Musa", date: "Aug 23, 2026", value: "₦320,000", status: "Completed", due: "Completed", icon: "phone" },
-  { id: "equipment-delivery", title: "Event Equipment", type: "Delivery", participant: "Kora Events", date: "Aug 19, 2026", value: "12 items", status: "Completed", due: "Delivered", icon: "truck" },
-];
+export const recordTypes = ["Borrow", "Service", "Rental", "Sale", "Delivery", "Payment", "Custom"] as const;
 
-export const timelineEvents = [
-  { type: "created", title: "ProofBox created", detail: "Muhammed created this record", time: "Sep 7, 2026 · 9:14 AM" },
-  { type: "evidence", title: "Evidence added", detail: "3 camera photos and a purchase receipt", time: "Sep 7, 2026 · 9:18 AM" },
-  { type: "invited", title: "Ahmed invited", detail: "Invitation sent by secure link", time: "Sep 7, 2026 · 9:21 AM" },
-  { type: "confirmed", title: "Muhammed confirmed", detail: "Agreement details accepted", time: "Sep 7, 2026 · 9:24 AM" },
-  { type: "waiting", title: "Waiting for Ahmed", detail: "Confirmation reminder scheduled", time: "Now" },
-];
+export function displayStatus(status: string, dueDate: string | null): ProofBoxStatus {
+  if (status === "completed") return "Completed";
+  if (status === "disputed") return "Disputed";
+  if (status === "draft") return "Draft";
+  if (status === "awaiting_confirmation") return "Awaiting confirmation";
+  if (dueDate) {
+    const days = daysUntil(dueDate);
+    if (days < 0) return "Overdue";
+    if (days <= 5) return "Due soon";
+  }
+  return "Active";
+}
 
-export const notifications = [
-  { id: 1, group: "Today", title: "Ahmed confirmed Camera Borrow", detail: "Both participants have now confirmed the record.", time: "2 minutes ago", kind: "confirmed", unread: true },
-  { id: 2, group: "Today", title: "Camera Borrow is due in 3 days", detail: "The Sony camera is due back on September 15.", time: "1 hour ago", kind: "reminder", unread: true },
-  { id: 3, group: "Yesterday", title: "You were invited to a ProofBox", detail: "Tunde invited you to review Laptop Rental.", time: "Yesterday · 4:30 PM", kind: "invited", unread: false },
-  { id: 4, group: "Earlier", title: "Payment evidence added", detail: "Ada Creative added a bank transfer receipt to Logo Design.", time: "Sep 8 · 11:02 AM", kind: "evidence", unread: false },
-];
+export function daysUntil(date: string): number {
+  const target = new Date(`${date}T00:00:00`).getTime();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Math.round((target - today.getTime()) / 86_400_000);
+}
+
+export function formatMoney(amount: number | null, currency: string | null): string {
+  if (amount === null || amount === undefined) return "No amount recorded";
+  const symbols: Record<string, string> = { NGN: "₦", USD: "$", GBP: "£", EUR: "€" };
+  const symbol = symbols[currency ?? "NGN"] ?? `${currency ?? ""} `;
+  return `${symbol}${Number(amount).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+}
+
+export function initialsOf(name: string | null | undefined): string {
+  if (!name) return "?";
+  const parts = name.trim().split(/[\s@.]+/).filter(Boolean);
+  return ((parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "")).toUpperCase() || "?";
+}
+
+export function formatDate(value: string | null | undefined): string {
+  if (!value) return "—";
+  const date = new Date(value.length <= 10 ? `${value}T00:00:00` : value);
+  return date.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+}
+
+export function formatDateTime(value: string | null | undefined): string {
+  if (!value) return "—";
+  const date = new Date(value);
+  return `${date.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })} · ${date.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}`;
+}
+
+export function relativeTime(value: string): string {
+  const diff = Date.now() - new Date(value).getTime();
+  const minutes = Math.round(diff / 60_000);
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  const days = Math.round(hours / 24);
+  if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`;
+  return formatDate(value);
+}
+
+export function dueLabel(status: string, dueDate: string | null, completedAt: string | null): string {
+  if (status === "completed") return completedAt ? `Completed ${formatDate(completedAt)}` : "Completed";
+  if (!dueDate) return "No due date";
+  const days = daysUntil(dueDate);
+  if (days < 0) return `Overdue by ${Math.abs(days)} day${Math.abs(days) === 1 ? "" : "s"}`;
+  if (days === 0) return "Due today";
+  if (days === 1) return "Due tomorrow";
+  return `Due ${formatDate(dueDate)}`;
+}
+
+export function fileSize(bytes: number | null): string {
+  if (!bytes) return "";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
