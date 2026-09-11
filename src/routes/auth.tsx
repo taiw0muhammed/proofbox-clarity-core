@@ -50,7 +50,7 @@ function AuthPage() {
     setBusy(true);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
-    if (error) return toast.error("Could not sign in", { description: error.message });
+    if (error) { toast.error("Could not sign in", { description: error.message }); return; }
     if (data.user) await ensureProfile(data.user);
     goNext();
   };
@@ -63,7 +63,7 @@ function AuthPage() {
       options: { emailRedirectTo: window.location.origin, data: { full_name: name } },
     });
     setBusy(false);
-    if (error) return toast.error("Could not create your account", { description: error.message });
+    if (error) { toast.error("Could not create your account", { description: error.message }); return; }
     if (data.session && data.user) {
       await ensureProfile(data.user);
       goNext();

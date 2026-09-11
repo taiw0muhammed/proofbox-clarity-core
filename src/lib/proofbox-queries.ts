@@ -67,6 +67,7 @@ export async function createBox(values: Omit<Tables["proof_boxes"]["Insert"], "c
   const box = unwrap(
     await supabase.from("proof_boxes").insert({ ...values, creator_id: auth.user.id }).select().single(),
   );
+  if (!box) throw new Error("Could not create this record.");
   const profile = await fetchProfile(auth.user.id);
   await supabase.from("participants").insert({
     proof_box_id: box.id,

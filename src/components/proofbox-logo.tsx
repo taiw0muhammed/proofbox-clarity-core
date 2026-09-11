@@ -11,11 +11,11 @@ export function ProofBoxMark({ className }: { className?: string }) {
   );
 }
 
-export function ProofBoxLogo({ compact = false }: { compact?: boolean }) {
+export function ProofBoxLogo({ compact = false, className }: { compact?: boolean; className?: string }) {
   return (
-    <span className="inline-flex items-center gap-2.5">
+    <span className={cn("inline-flex items-center gap-2.5", className)}>
       <ProofBoxMark />
-      {!compact && <span className="text-[17px] font-bold text-foreground">ProofBox</span>}
+      {!compact && <span className="text-[17px] font-bold">ProofBox</span>}
     </span>
   );
 }

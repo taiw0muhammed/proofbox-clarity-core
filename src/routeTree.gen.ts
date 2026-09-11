@@ -10,20 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as NotificationsRouteImport } from './routes/notifications'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as ProofboxesIndexRouteImport } from './routes/proofboxes.index'
-import { Route as ProofboxesIdRouteImport } from './routes/proofboxes.$id'
-import { Route as ProofboxesCreateRouteImport } from './routes/proofboxes.create'
-import { Route as ProofboxesIdIndexRouteImport } from './routes/proofboxes.$id.index'
-import { Route as ProofboxesIdConfirmRouteImport } from './routes/proofboxes.$id.confirm'
-import { Route as ProofboxesIdConfirmedRouteImport } from './routes/proofboxes.$id.confirmed'
+import { Route as VerifyRouteImport } from './routes/verify'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as InviteTokenRouteImport } from './routes/invite.$token'
+import { Route as AuthenticatedProofboxesIndexRouteImport } from './routes/_authenticated/proofboxes.index'
+import { Route as AuthenticatedProofboxesIdRouteImport } from './routes/_authenticated/proofboxes.$id'
+import { Route as AuthenticatedProofboxesCreateRouteImport } from './routes/_authenticated/proofboxes.create'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -31,141 +35,135 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardRoute = DashboardRouteImport.update({
+const VerifyRoute = VerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const NotificationsRoute = NotificationsRouteImport.update({
-  id: '/notifications',
-  path: '/notifications',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const InviteTokenRoute = InviteTokenRouteImport.update({
+  id: '/invite/$token',
+  path: '/invite/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProofboxesIndexRoute = ProofboxesIndexRouteImport.update({
-  id: '/proofboxes/',
-  path: '/proofboxes/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProofboxesIdRoute = ProofboxesIdRouteImport.update({
-  id: '/proofboxes/$id',
-  path: '/proofboxes/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProofboxesCreateRoute = ProofboxesCreateRouteImport.update({
-  id: '/proofboxes/create',
-  path: '/proofboxes/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProofboxesIdIndexRoute = ProofboxesIdIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ProofboxesIdRoute,
-} as any)
-const ProofboxesIdConfirmRoute = ProofboxesIdConfirmRouteImport.update({
-  id: '/confirm',
-  path: '/confirm',
-  getParentRoute: () => ProofboxesIdRoute,
-} as any)
-const ProofboxesIdConfirmedRoute = ProofboxesIdConfirmedRouteImport.update({
-  id: '/confirmed',
-  path: '/confirmed',
-  getParentRoute: () => ProofboxesIdRoute,
-} as any)
+const AuthenticatedProofboxesIndexRoute =
+  AuthenticatedProofboxesIndexRouteImport.update({
+    id: '/proofboxes/',
+    path: '/proofboxes/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProofboxesIdRoute =
+  AuthenticatedProofboxesIdRouteImport.update({
+    id: '/proofboxes/$id',
+    path: '/proofboxes/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProofboxesCreateRoute =
+  AuthenticatedProofboxesCreateRouteImport.update({
+    id: '/proofboxes/create',
+    path: '/proofboxes/create',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/dashboard': typeof DashboardRoute
-  '/notifications': typeof NotificationsRoute
-  '/settings': typeof SettingsRoute
-  '/proofboxes/$id': typeof ProofboxesIdRouteWithChildren
-  '/proofboxes/create': typeof ProofboxesCreateRoute
-  '/proofboxes/': typeof ProofboxesIndexRoute
-  '/proofboxes/$id/confirm': typeof ProofboxesIdConfirmRoute
-  '/proofboxes/$id/confirmed': typeof ProofboxesIdConfirmedRoute
-  '/proofboxes/$id/': typeof ProofboxesIdIndexRoute
+  '/verify': typeof VerifyRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/invite/$token': typeof InviteTokenRoute
+  '/proofboxes/$id': typeof AuthenticatedProofboxesIdRoute
+  '/proofboxes/create': typeof AuthenticatedProofboxesCreateRoute
+  '/proofboxes/': typeof AuthenticatedProofboxesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/dashboard': typeof DashboardRoute
-  '/notifications': typeof NotificationsRoute
-  '/settings': typeof SettingsRoute
-  '/proofboxes/create': typeof ProofboxesCreateRoute
-  '/proofboxes': typeof ProofboxesIndexRoute
-  '/proofboxes/$id/confirm': typeof ProofboxesIdConfirmRoute
-  '/proofboxes/$id/confirmed': typeof ProofboxesIdConfirmedRoute
-  '/proofboxes/$id': typeof ProofboxesIdIndexRoute
+  '/verify': typeof VerifyRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/invite/$token': typeof InviteTokenRoute
+  '/proofboxes/$id': typeof AuthenticatedProofboxesIdRoute
+  '/proofboxes/create': typeof AuthenticatedProofboxesCreateRoute
+  '/proofboxes': typeof AuthenticatedProofboxesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/dashboard': typeof DashboardRoute
-  '/notifications': typeof NotificationsRoute
-  '/settings': typeof SettingsRoute
-  '/proofboxes/$id': typeof ProofboxesIdRouteWithChildren
-  '/proofboxes/create': typeof ProofboxesCreateRoute
-  '/proofboxes/': typeof ProofboxesIndexRoute
-  '/proofboxes/$id/confirm': typeof ProofboxesIdConfirmRoute
-  '/proofboxes/$id/confirmed': typeof ProofboxesIdConfirmedRoute
-  '/proofboxes/$id/': typeof ProofboxesIdIndexRoute
+  '/verify': typeof VerifyRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/invite/$token': typeof InviteTokenRoute
+  '/_authenticated/proofboxes/$id': typeof AuthenticatedProofboxesIdRoute
+  '/_authenticated/proofboxes/create': typeof AuthenticatedProofboxesCreateRoute
+  '/_authenticated/proofboxes/': typeof AuthenticatedProofboxesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
+    | '/verify'
     | '/dashboard'
     | '/notifications'
     | '/settings'
+    | '/invite/$token'
     | '/proofboxes/$id'
     | '/proofboxes/create'
     | '/proofboxes/'
-    | '/proofboxes/$id/confirm'
-    | '/proofboxes/$id/confirmed'
-    | '/proofboxes/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/verify'
     | '/dashboard'
     | '/notifications'
     | '/settings'
+    | '/invite/$token'
+    | '/proofboxes/$id'
     | '/proofboxes/create'
     | '/proofboxes'
-    | '/proofboxes/$id/confirm'
-    | '/proofboxes/$id/confirmed'
-    | '/proofboxes/$id'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/auth'
-    | '/dashboard'
-    | '/notifications'
-    | '/settings'
-    | '/proofboxes/$id'
-    | '/proofboxes/create'
-    | '/proofboxes/'
-    | '/proofboxes/$id/confirm'
-    | '/proofboxes/$id/confirmed'
-    | '/proofboxes/$id/'
+    | '/verify'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/notifications'
+    | '/_authenticated/settings'
+    | '/invite/$token'
+    | '/_authenticated/proofboxes/$id'
+    | '/_authenticated/proofboxes/create'
+    | '/_authenticated/proofboxes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  DashboardRoute: typeof DashboardRoute
-  NotificationsRoute: typeof NotificationsRoute
-  SettingsRoute: typeof SettingsRoute
-  ProofboxesIdRoute: typeof ProofboxesIdRouteWithChildren
-  ProofboxesCreateRoute: typeof ProofboxesCreateRoute
-  ProofboxesIndexRoute: typeof ProofboxesIndexRoute
+  VerifyRoute: typeof VerifyRoute
+  InviteTokenRoute: typeof InviteTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -177,6 +175,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -184,97 +189,92 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard': {
-      id: '/dashboard'
+    '/verify': {
+      id: '/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof VerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/notifications': {
-      id: '/notifications'
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
       path: '/notifications'
       fullPath: '/notifications'
-      preLoaderRoute: typeof NotificationsRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/settings': {
-      id: '/settings'
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
       path: '/settings'
       fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/invite/$token': {
+      id: '/invite/$token'
+      path: '/invite/$token'
+      fullPath: '/invite/$token'
+      preLoaderRoute: typeof InviteTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/proofboxes/': {
-      id: '/proofboxes/'
+    '/_authenticated/proofboxes/': {
+      id: '/_authenticated/proofboxes/'
       path: '/proofboxes'
       fullPath: '/proofboxes/'
-      preLoaderRoute: typeof ProofboxesIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedProofboxesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/proofboxes/$id': {
-      id: '/proofboxes/$id'
+    '/_authenticated/proofboxes/$id': {
+      id: '/_authenticated/proofboxes/$id'
       path: '/proofboxes/$id'
       fullPath: '/proofboxes/$id'
-      preLoaderRoute: typeof ProofboxesIdRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedProofboxesIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/proofboxes/create': {
-      id: '/proofboxes/create'
+    '/_authenticated/proofboxes/create': {
+      id: '/_authenticated/proofboxes/create'
       path: '/proofboxes/create'
       fullPath: '/proofboxes/create'
-      preLoaderRoute: typeof ProofboxesCreateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/proofboxes/$id/': {
-      id: '/proofboxes/$id/'
-      path: '/'
-      fullPath: '/proofboxes/$id/'
-      preLoaderRoute: typeof ProofboxesIdIndexRouteImport
-      parentRoute: typeof ProofboxesIdRoute
-    }
-    '/proofboxes/$id/confirm': {
-      id: '/proofboxes/$id/confirm'
-      path: '/confirm'
-      fullPath: '/proofboxes/$id/confirm'
-      preLoaderRoute: typeof ProofboxesIdConfirmRouteImport
-      parentRoute: typeof ProofboxesIdRoute
-    }
-    '/proofboxes/$id/confirmed': {
-      id: '/proofboxes/$id/confirmed'
-      path: '/confirmed'
-      fullPath: '/proofboxes/$id/confirmed'
-      preLoaderRoute: typeof ProofboxesIdConfirmedRouteImport
-      parentRoute: typeof ProofboxesIdRoute
+      preLoaderRoute: typeof AuthenticatedProofboxesCreateRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
-interface ProofboxesIdRouteChildren {
-  ProofboxesIdConfirmRoute: typeof ProofboxesIdConfirmRoute
-  ProofboxesIdConfirmedRoute: typeof ProofboxesIdConfirmedRoute
-  ProofboxesIdIndexRoute: typeof ProofboxesIdIndexRoute
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedProofboxesIdRoute: typeof AuthenticatedProofboxesIdRoute
+  AuthenticatedProofboxesCreateRoute: typeof AuthenticatedProofboxesCreateRoute
+  AuthenticatedProofboxesIndexRoute: typeof AuthenticatedProofboxesIndexRoute
 }
 
-const ProofboxesIdRouteChildren: ProofboxesIdRouteChildren = {
-  ProofboxesIdConfirmRoute: ProofboxesIdConfirmRoute,
-  ProofboxesIdConfirmedRoute: ProofboxesIdConfirmedRoute,
-  ProofboxesIdIndexRoute: ProofboxesIdIndexRoute,
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedProofboxesIdRoute: AuthenticatedProofboxesIdRoute,
+  AuthenticatedProofboxesCreateRoute: AuthenticatedProofboxesCreateRoute,
+  AuthenticatedProofboxesIndexRoute: AuthenticatedProofboxesIndexRoute,
 }
 
-const ProofboxesIdRouteWithChildren = ProofboxesIdRoute._addFileChildren(
-  ProofboxesIdRouteChildren,
-)
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  DashboardRoute: DashboardRoute,
-  NotificationsRoute: NotificationsRoute,
-  SettingsRoute: SettingsRoute,
-  ProofboxesIdRoute: ProofboxesIdRouteWithChildren,
-  ProofboxesCreateRoute: ProofboxesCreateRoute,
-  ProofboxesIndexRoute: ProofboxesIndexRoute,
+  VerifyRoute: VerifyRoute,
+  InviteTokenRoute: InviteTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

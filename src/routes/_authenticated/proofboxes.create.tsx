@@ -35,7 +35,7 @@ function CreatePage() {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const title = String(form.get("title") ?? "").trim();
-    if (!title) return toast.error("Add a title so everyone knows what this is.");
+    if (!title) { toast.error("Add a title so everyone knows what this is."); return; }
     const amountRaw = String(form.get("amount") ?? "").replace(/[^\d.]/g, "");
     setBusy(true);
     try {
