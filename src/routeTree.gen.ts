@@ -12,10 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProofboxesIndexRouteImport } from './routes/_authenticated/proofboxes.index'
+import { Route as AuthenticatedProofboxesIdRouteImport } from './routes/_authenticated/proofboxes.$id'
 import { Route as AuthenticatedProofboxesCreateRouteImport } from './routes/_authenticated/proofboxes.create'
 
 const IndexRoute = IndexRouteImport.update({
@@ -30,6 +32,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyRoute = VerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -54,6 +61,12 @@ const AuthenticatedProofboxesIndexRoute =
     path: '/proofboxes/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProofboxesIdRoute =
+  AuthenticatedProofboxesIdRouteImport.update({
+    id: '/proofboxes/$id',
+    path: '/proofboxes/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProofboxesCreateRoute =
   AuthenticatedProofboxesCreateRouteImport.update({
     id: '/proofboxes/create',
@@ -64,18 +77,22 @@ const AuthenticatedProofboxesCreateRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/verify': typeof VerifyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/proofboxes/$id': typeof AuthenticatedProofboxesIdRoute
   '/proofboxes/create': typeof AuthenticatedProofboxesCreateRoute
   '/proofboxes/': typeof AuthenticatedProofboxesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/verify': typeof VerifyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/proofboxes/$id': typeof AuthenticatedProofboxesIdRoute
   '/proofboxes/create': typeof AuthenticatedProofboxesCreateRoute
   '/proofboxes': typeof AuthenticatedProofboxesIndexRoute
 }
@@ -84,9 +101,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/verify': typeof VerifyRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/proofboxes/$id': typeof AuthenticatedProofboxesIdRoute
   '/_authenticated/proofboxes/create': typeof AuthenticatedProofboxesCreateRoute
   '/_authenticated/proofboxes/': typeof AuthenticatedProofboxesIndexRoute
 }
@@ -95,18 +114,22 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/verify'
     | '/dashboard'
     | '/notifications'
     | '/settings'
+    | '/proofboxes/$id'
     | '/proofboxes/create'
     | '/proofboxes/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/verify'
     | '/dashboard'
     | '/notifications'
     | '/settings'
+    | '/proofboxes/$id'
     | '/proofboxes/create'
     | '/proofboxes'
   id:
@@ -114,9 +137,11 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/verify'
     | '/_authenticated/dashboard'
     | '/_authenticated/notifications'
     | '/_authenticated/settings'
+    | '/_authenticated/proofboxes/$id'
     | '/_authenticated/proofboxes/create'
     | '/_authenticated/proofboxes/'
   fileRoutesById: FileRoutesById
@@ -125,6 +150,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  VerifyRoute: typeof VerifyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -148,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify': {
+      id: '/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof VerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard': {
@@ -178,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProofboxesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/proofboxes/$id': {
+      id: '/_authenticated/proofboxes/$id'
+      path: '/proofboxes/$id'
+      fullPath: '/proofboxes/$id'
+      preLoaderRoute: typeof AuthenticatedProofboxesIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/proofboxes/create': {
       id: '/_authenticated/proofboxes/create'
       path: '/proofboxes/create'
@@ -192,6 +232,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedProofboxesIdRoute: typeof AuthenticatedProofboxesIdRoute
   AuthenticatedProofboxesCreateRoute: typeof AuthenticatedProofboxesCreateRoute
   AuthenticatedProofboxesIndexRoute: typeof AuthenticatedProofboxesIndexRoute
 }
@@ -200,6 +241,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedProofboxesIdRoute: AuthenticatedProofboxesIdRoute,
   AuthenticatedProofboxesCreateRoute: AuthenticatedProofboxesCreateRoute,
   AuthenticatedProofboxesIndexRoute: AuthenticatedProofboxesIndexRoute,
 }
@@ -211,6 +253,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  VerifyRoute: VerifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
