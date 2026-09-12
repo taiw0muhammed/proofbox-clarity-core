@@ -40,9 +40,13 @@ function AuthPage() {
   };
 
   useEffect(() => {
+    let active = true;
     supabase.auth.getUser().then(({ data }) => {
-      if (data.user) goNext();
+      if (active && data.user) goNext();
     });
+    return () => {
+      active = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

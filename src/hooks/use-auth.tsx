@@ -9,14 +9,19 @@ export function useUser() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let active = true;
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      if (active) setUser(session?.user ?? null);
     });
     supabase.auth.getUser().then(({ data }) => {
+      if (!active) return;
       setUser(data.user ?? null);
       setLoading(false);
     });
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   return { user, loading };
