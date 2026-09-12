@@ -79,7 +79,7 @@ Tech Stack
 
 Live App
 
-"Open ProofBox" (https://reference-url-citation.invalid/0)
+"Open ProofBox" (proofbox-five.vercel.app)
 
 Development
 
@@ -94,7 +94,7 @@ The development server will start locally.
 
 Built With Lovable
 
-ProofBox was initially designed and developed with "Lovable" (https://reference-url-citation.invalid/1).
+ProofBox was initially designed and developed with "Lovable" 
 
 Development can continue through the Lovable editor, with changes synced to GitHub.
 
