@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { verifyCode } from "@/lib/proofbox-queries";
 import { formatDate } from "@/lib/proofbox-data";
 
 export const Route = createFileRoute("/verify")({
+  validateSearch: (search: Record<string, unknown>) => ({ code: typeof search["code"] === "string" ? search["code"] : "" }),
   head: () => ({
     meta: [
       { title: "Verify a record — ProofBox" },
@@ -25,18 +26,18 @@ export const Route = createFileRoute("/verify")({
 type Result = { title?: string; type?: string; status?: string; created_at?: string; participants?: number } | null;
 
 function VerifyPage() {
-  const [code, setCode] = useState("");
+  const { code: scannedCode } = Route.useSearch();
+  const [code, setCode] = useState(scannedCode);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function check(event: React.FormEvent) {
-    event.preventDefault();
+  const runCheck = useCallback(async (value: string) => {
     setLoading(true);
     setError(null);
     setResult(null);
     try {
-      const data = (await verifyCode(code.trim())) as Result | Result[];
+      const data = (await verifyCode(value.trim())) as Result | Result[];
       const row = Array.isArray(data) ? (data[0] ?? null) : data;
       if (!row) setError("No record found with that code.");
       else setResult(row);
@@ -45,6 +46,15 @@ function VerifyPage() {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    if (scannedCode.trim()) void runCheck(scannedCode);
+  }, [scannedCode, runCheck]);
+
+  function check(event: React.FormEvent) {
+    event.preventDefault();
+    void runCheck(code);
   }
 
   return (

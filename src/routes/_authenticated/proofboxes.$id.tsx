@@ -16,6 +16,7 @@ import {
   StatusBadge,
   Timeline,
 } from "@/components/proofbox-ui";
+import { ProofBoxQRCard } from "@/components/proofbox-qr";
 import { useUser } from "@/hooks/use-auth";
 import {
   completeBox,
@@ -278,6 +279,7 @@ function DetailPage() {
               </>
             )}
           </div>
+          <ProofBoxQRCard code={box.code} />
           <ConfirmationPanel compact />
         </aside>
       </div>
