@@ -68,10 +68,6 @@ function DashboardPage() {
           <div className="grid gap-3">{records.slice(0, 6).map((record) => <ProofBoxCard key={record.id} record={record} />)}</div>
         </section>
       )}
-
-      <Button asChild className="fixed bottom-24 right-4 z-30 size-12 rounded-full p-0 shadow-brand sm:hidden">
-        <Link to="/proofboxes/create" aria-label="Create ProofBox"><Plus /></Link>
-      </Button>
     </AppShell>
   );
 }
