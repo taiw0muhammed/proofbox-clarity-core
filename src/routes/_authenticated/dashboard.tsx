@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, ClientOnly, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Bell, CheckCircle2, Clock3, FileText, Loader2, Plus } from "lucide-react";
 import { AppShell, PageHeading, SectionHeading } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { EmptyState, ProofBoxCard, StatCard } from "@/components/proofbox-ui";
+import { DashboardCharts } from "@/components/dashboard-charts";
 import { fetchBoxes, toRecord } from "@/lib/proofbox-queries";
 import { useProfile, useUser } from "@/hooks/use-auth";
 
@@ -54,6 +55,15 @@ function DashboardPage() {
       {error && <p className="mt-10 rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">We couldn't load your records. Please refresh and try again.</p>}
 
       {!isLoading && !error && records.length === 0 && <div className="mt-9"><EmptyState /></div>}
+
+      {!isLoading && !error && records.length > 0 && (
+        <section className="mt-9">
+          <SectionHeading title="Activity" />
+          <ClientOnly fallback={<div className="h-52 rounded-lg border bg-card" />}>
+            <DashboardCharts boxes={boxes ?? []} />
+          </ClientOnly>
+        </section>
+      )}
 
       {needsAttention.length > 0 && (
         <section className="mt-9">

@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { updateProfile } from "@/lib/proofbox-queries";
 import { useProfile, useUser } from "@/hooks/use-auth";
+import { useTheme } from "@/hooks/use-theme";
 import { initialsOf } from "@/lib/proofbox-data";
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
 function SettingsPage() {
   const { user } = useUser();
   const { data: profile } = useProfile();
+  const { theme, setTheme } = useTheme();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
@@ -87,6 +89,18 @@ function SettingsPage() {
             <Button type="submit" disabled={busy}>{busy && <Loader2 className="animate-spin" />}Save changes</Button>
           </div>
         </form>
+      </section>
+
+      <section className="mt-9">
+        <SectionHeading title="Appearance" />
+        <div className="overflow-hidden rounded-lg border bg-card shadow-card">
+          <ToggleRow
+            label="Dark mode"
+            description="Easier on the eyes in low light."
+            checked={theme === "dark"}
+            onChange={(value) => setTheme(value ? "dark" : "light")}
+          />
+        </div>
       </section>
 
       <section className="mt-9">
