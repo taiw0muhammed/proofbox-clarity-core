@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Check, Flag, Loader2, MessageSquare, Upload, UserPlus } from "lucide-react";
+import { ArrowLeft, Check, FileDown, Flag, Loader2, MessageSquare, Upload, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell, SectionHeading } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ import {
   requestChanges,
   uploadEvidence,
 } from "@/lib/proofbox-queries";
+import { downloadCertificate } from "@/lib/proofbox-certificate";
 import {
   displayStatus,
   dueLabel,
@@ -59,6 +60,7 @@ function DetailPage() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteName, setInviteName] = useState("");
   const [changeNote, setChangeNote] = useState("");
+  const [downloading, setDownloading] = useState(false);
 
   const { data: box, isLoading } = useQuery({ queryKey: ["box", id], queryFn: () => fetchBox(id) });
   const refresh = () => {
@@ -140,6 +142,21 @@ function DetailPage() {
         <p className="mt-2 font-medium text-muted-foreground">
           {box.amount !== null ? `${formatMoney(box.amount, box.currency)} · ` : ""}{box.code}
         </p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-4"
+          disabled={downloading}
+          onClick={() => {
+            setDownloading(true);
+            downloadCertificate(box)
+              .then(() => toast.success("Certificate downloaded"))
+              .catch(() => toast.error("Could not create the certificate. Please try again."))
+              .finally(() => setDownloading(false));
+          }}
+        >
+          {downloading ? <Loader2 className="animate-spin" /> : <FileDown />}Download certificate
+        </Button>
       </header>
 
       <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
