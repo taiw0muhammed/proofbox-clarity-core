@@ -187,6 +187,63 @@ export type Database = {
           },
         ]
       }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string
+          description: string
+          evidence_id: string | null
+          id: string
+          payment_date: string
+          payment_method: string
+          proof_box_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by: string
+          description: string
+          evidence_id?: string | null
+          id?: string
+          payment_date: string
+          payment_method?: string
+          proof_box_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string
+          description?: string
+          evidence_id?: string | null
+          id?: string
+          payment_date?: string
+          payment_method?: string
+          proof_box_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_evidence_id_fkey"
+            columns: ["evidence_id"]
+            isOneToOne: false
+            referencedRelation: "evidence"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_proof_box_id_fkey"
+            columns: ["proof_box_id"]
+            isOneToOne: false
+            referencedRelation: "proof_boxes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -288,6 +345,94 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      proofbox_user_state: {
+        Row: {
+          archived_at: string | null
+          created_at: string
+          last_viewed_at: string | null
+          proof_box_id: string
+          starred: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string
+          last_viewed_at?: string | null
+          proof_box_id: string
+          starred?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string
+          last_viewed_at?: string | null
+          proof_box_id?: string
+          starred?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proofbox_user_state_proof_box_id_fkey"
+            columns: ["proof_box_id"]
+            isOneToOne: false
+            referencedRelation: "proof_boxes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reminders: {
+        Row: {
+          advance_days: number
+          completed: boolean
+          created_at: string
+          id: string
+          note: string | null
+          proof_box_id: string | null
+          remind_at: string
+          reminder_type: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          advance_days?: number
+          completed?: boolean
+          created_at?: string
+          id?: string
+          note?: string | null
+          proof_box_id?: string | null
+          remind_at: string
+          reminder_type?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          advance_days?: number
+          completed?: boolean
+          created_at?: string
+          id?: string
+          note?: string | null
+          proof_box_id?: string | null
+          remind_at?: string
+          reminder_type?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reminders_proof_box_id_fkey"
+            columns: ["proof_box_id"]
+            isOneToOne: false
+            referencedRelation: "proof_boxes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       timeline_events: {
         Row: {
