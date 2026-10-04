@@ -1,0 +1,9 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
+import { AppShell, PageHeading } from "@/components/app-shell";
+import { Button } from "@/components/ui/button";
+import { proofBoxTemplates } from "@/lib/proofbox-templates";
+
+export const Route = createFileRoute("/_authenticated/templates")({ head: () => ({ meta: [{ title: "Templates — ProofBox" }, { name: "description", content: "Create a ProofBox faster with a ready-made template." }, { property: "og:title", content: "Templates — ProofBox" }, { property: "og:description", content: "Create a ProofBox faster with a ready-made template." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }), component: TemplatesPage });
+
+function TemplatesPage() { return <AppShell><PageHeading title="Start with a template" description="Create a ProofBox faster with a ready-made template." /><div className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{proofBoxTemplates.map((template) => { const Icon = template.icon; return <article key={template.slug} className="flex min-h-56 flex-col rounded-lg border bg-card p-5 shadow-card transition hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-card-hover"><span className="grid size-10 place-items-center rounded-md bg-primary-soft text-primary"><Icon className="size-5" /></span><h2 className="mt-5 font-semibold">{template.name}</h2><p className="mt-1 text-sm leading-6 text-muted-foreground">{template.description}</p><Button asChild variant="outline" className="mt-auto self-start"><Link to="/proofboxes/create" search={{ template: template.slug }}>{`Create ${template.name}`}<ArrowRight /></Link></Button></article>; })}</div></AppShell>; }
