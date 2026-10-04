@@ -8,3 +8,8 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+## Architecture rules
+
+- Product-owned record state (stars, archive, recently viewed) lives in `proofbox_user_state`, so shared ProofBoxes can differ per user without changing the immutable agreement.
+- Payments and reminders remain separate private resources linked to a ProofBox; this keeps agreement history intact while allowing ongoing management.
