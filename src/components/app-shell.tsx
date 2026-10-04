@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Bell, FileText, Home, LogOut, Plus, Settings, UserRound } from "lucide-react";
+import { Activity, Bell, CalendarDays, FileText, FolderOpen, Home, LayoutTemplate, LogOut, Menu, Plus, QrCode, Settings, UserRound, WalletCards } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,10 +8,18 @@ import { useProfile, useUser } from "@/hooks/use-auth";
 import { initialsOf } from "@/lib/proofbox-data";
 import { ProofBoxLogo, ProofBoxMark } from "@/components/proofbox-logo";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const nav = [
   { label: "Home", to: "/dashboard", icon: Home },
   { label: "ProofBoxes", to: "/proofboxes", icon: FileText },
+  { label: "Templates", to: "/templates", icon: LayoutTemplate },
+  { label: "Calendar", to: "/calendar", icon: CalendarDays },
+  { label: "Payments", to: "/payments", icon: WalletCards },
+  { label: "Evidence", to: "/evidence", icon: FolderOpen },
+  { label: "Activity", to: "/activity", icon: Activity },
+  { label: "Scan", to: "/scan", icon: QrCode },
   { label: "Notifications", to: "/notifications", icon: Bell },
   { label: "Settings", to: "/settings", icon: Settings },
 ] as const;
@@ -48,14 +56,18 @@ export function AppShell({ children }: { children: ReactNode }) {
         <MobileLink to="/dashboard" label="Home" icon={Home} active={pathname === "/dashboard"} />
         <MobileLink to="/proofboxes" label="ProofBoxes" icon={FileText} active={pathname === "/proofboxes" || pathname.startsWith("/proofboxes/")} />
         <Link to="/proofboxes/create" aria-label="Create ProofBox" className="flex min-h-14 flex-col items-center justify-center gap-1 text-xs font-semibold text-primary"><span className="grid size-11 -translate-y-4 place-items-center rounded-full bg-primary text-primary-foreground shadow-brand"><Plus className="size-5" /></span><span className="-mt-4">Create</span></Link>
-        <MobileLink to="/notifications" label="Alerts" icon={Bell} active={pathname === "/notifications"} />
-        <MobileLink to="/settings" label="Profile" icon={UserRound} active={pathname === "/settings"} />
+        <MobileLink to="/scan" label="Scan" icon={QrCode} active={pathname === "/scan"} />
+        <MobileMore pathname={pathname} />
       </nav>
     </div>
   );
 }
 
-function MobileLink({ to, label, icon: Icon, active }: { to: "/dashboard" | "/proofboxes" | "/notifications" | "/settings"; label: string; icon: typeof Home; active: boolean }) { return <Link to={to} className={cn("flex min-h-14 flex-col items-center justify-center gap-1 text-[11px] font-medium text-muted-foreground", active && "text-primary")}><Icon className="size-5" /><span>{label}</span></Link>; }
+type MobilePath = "/dashboard" | "/proofboxes" | "/scan";
+function MobileLink({ to, label, icon: Icon, active }: { to: MobilePath; label: string; icon: typeof Home; active: boolean }) { return <Link to={to} className={cn("flex min-h-14 flex-col items-center justify-center gap-1 text-[11px] font-medium text-muted-foreground", active && "text-primary")}><Icon className="size-5" /><span>{label}</span></Link>; }
+
+const moreNav = nav.filter((item) => !["/dashboard", "/proofboxes", "/scan"].includes(item.to));
+function MobileMore({ pathname }: { pathname: string }) { const active = moreNav.some((item) => pathname === item.to); return <Sheet><SheetTrigger asChild><button type="button" className={cn("flex min-h-14 flex-col items-center justify-center gap-1 text-[11px] font-medium text-muted-foreground", active && "text-primary")}><Menu className="size-5" /><span>More</span></button></SheetTrigger><SheetContent side="bottom" className="rounded-t-xl pb-[max(1.5rem,env(safe-area-inset-bottom))]"><SheetHeader className="text-left"><SheetTitle>Explore ProofBox</SheetTitle><SheetDescription>Manage everything around your agreements.</SheetDescription></SheetHeader><div className="mt-5 grid grid-cols-2 gap-2">{moreNav.map(({ label, to, icon: Icon }) => <SheetClose asChild key={to}><Link to={to} className="flex min-h-16 items-center gap-3 rounded-lg border bg-card p-3 text-sm font-medium"><span className="grid size-9 place-items-center rounded-md bg-secondary text-primary"><Icon className="size-4" /></span>{label}</Link></SheetClose>)}</div><Button asChild className="mt-5 w-full"><Link to="/proofboxes/create"><Plus />Create ProofBox</Link></Button></SheetContent></Sheet>; }
 
 export function PageHeading({ title, description, action }: { title: string; description?: string; action?: ReactNode }) { return <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4"><div className="min-w-0"><h1 className="text-2xl font-bold text-foreground sm:text-3xl">{title}</h1>{description && <p className="mt-1.5 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">{description}</p>}</div>{action}</header>; }
 

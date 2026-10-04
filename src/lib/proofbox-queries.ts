@@ -10,6 +10,9 @@ export type TimelineEvent = Tables["timeline_events"]["Row"];
 export type Amendment = Tables["amendments"]["Row"];
 export type AppNotification = Tables["notifications"]["Row"];
 export type Profile = Tables["profiles"]["Row"];
+export type UserState = Tables["proofbox_user_state"]["Row"];
+export type Payment = Tables["payments"]["Row"];
+export type Reminder = Tables["reminders"]["Row"];
 
 export type BoxWithParticipants = Box & { participants: Participant[] };
 export type FullBox = Box & {
@@ -17,7 +20,11 @@ export type FullBox = Box & {
   evidence: Evidence[];
   timeline_events: TimelineEvent[];
   amendments: Amendment[];
+  payments?: Payment[];
 };
+export type BoxWithState = BoxWithParticipants & { userState: UserState | null };
+export type EvidenceWithBox = Evidence & { proof_boxes: Pick<Box, "id" | "title" | "code"> | null };
+export type ActivityWithBox = TimelineEvent & { proof_boxes: Pick<Box, "id" | "title" | "type"> | null };
 
 function unwrap<T>({ data, error }: { data: T; error: { message: string } | null }): T {
   if (error) throw new Error(error.message);
@@ -51,14 +58,66 @@ export async function fetchBoxes() {
   ) as BoxWithParticipants[];
 }
 
+export async function fetchBoxesWithState() {
+  const [{ data: auth }, boxes, states] = await Promise.all([
+    supabase.auth.getUser(),
+    fetchBoxes(),
+    unwrap(await supabase.from("proofbox_user_state").select("*").order("last_viewed_at", { ascending: false })),
+  ]);
+  const stateMap = new Map((states ?? []).map((state) => [state.proof_box_id, state]));
+  return { userId: auth.user?.id ?? null, boxes: boxes.map((box) => ({ ...box, userState: stateMap.get(box.id) ?? null })) as BoxWithState[] };
+}
+
 export async function fetchBox(id: string) {
   return unwrap(
     await supabase
       .from("proof_boxes")
-      .select("*, participants(*), evidence(*), timeline_events(*), amendments(*)")
+      .select("*, participants(*), evidence(*), timeline_events(*), amendments(*), payments(*)")
       .eq("id", id)
       .maybeSingle(),
   ) as FullBox | null;
+}
+
+export async function setBoxState(proofBoxId: string, values: Pick<Tables["proofbox_user_state"]["Update"], "starred" | "archived_at" | "last_viewed_at">) {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) throw new Error("You need to be signed in.");
+  return unwrap(await supabase.from("proofbox_user_state").upsert({ user_id: auth.user.id, proof_box_id: proofBoxId, ...values }, { onConflict: "user_id,proof_box_id" }).select().single());
+}
+
+export async function duplicateBox(source: FullBox) {
+  return createBox({ title: `${source.title} copy`, type: source.type, description: source.description, terms: source.terms, responsibilities: source.responsibilities, amount: source.amount, currency: source.currency, start_date: null, due_date: null, status: "draft" });
+}
+
+export async function fetchPayments() {
+  return unwrap(await supabase.from("payments").select("*, proof_boxes(id,title,code,amount,currency,status,due_date)").order("payment_date", { ascending: false }));
+}
+
+export async function addPayment(values: Omit<Tables["payments"]["Insert"], "created_by">) {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) throw new Error("You need to be signed in.");
+  return unwrap(await supabase.from("payments").insert({ ...values, created_by: auth.user.id }).select().single());
+}
+
+export async function fetchReminders() {
+  return unwrap(await supabase.from("reminders").select("*, proof_boxes(id,title,code)").order("remind_at", { ascending: true }));
+}
+
+export async function addReminder(values: Omit<Tables["reminders"]["Insert"], "user_id">) {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) throw new Error("You need to be signed in.");
+  return unwrap(await supabase.from("reminders").insert({ ...values, user_id: auth.user.id }).select().single());
+}
+
+export async function toggleReminder(id: string, completed: boolean) {
+  return unwrap(await supabase.from("reminders").update({ completed }).eq("id", id).select().single());
+}
+
+export async function fetchEvidenceVault() {
+  return unwrap(await supabase.from("evidence").select("*, proof_boxes(id,title,code)").order("created_at", { ascending: false })) as EvidenceWithBox[];
+}
+
+export async function fetchActivity() {
+  return unwrap(await supabase.from("timeline_events").select("*, proof_boxes(id,title,type)").order("created_at", { ascending: false }).limit(120)) as ActivityWithBox[];
 }
 
 export async function createBox(values: Omit<Tables["proof_boxes"]["Insert"], "creator_id">) {
