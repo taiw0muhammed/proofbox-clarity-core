@@ -20,6 +20,7 @@ import { Route as AuthenticatedEvidenceRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedPaymentsRouteImport } from './routes/_authenticated/payments'
 import { Route as AuthenticatedRemindersRouteImport } from './routes/_authenticated/reminders'
+import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authenticated/templates'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
@@ -82,6 +83,11 @@ const AuthenticatedRemindersRoute = AuthenticatedRemindersRouteImport.update({
   path: '/reminders',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedScanRoute = AuthenticatedScanRouteImport.update({
+  id: '/scan',
+  path: '/scan',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/payments': typeof AuthenticatedPaymentsRoute
   '/reminders': typeof AuthenticatedRemindersRoute
+  '/scan': typeof AuthenticatedScanRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/templates': typeof AuthenticatedTemplatesRoute
   '/invite/$token': typeof InviteTokenRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/payments': typeof AuthenticatedPaymentsRoute
   '/reminders': typeof AuthenticatedRemindersRoute
+  '/scan': typeof AuthenticatedScanRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/templates': typeof AuthenticatedTemplatesRoute
   '/invite/$token': typeof InviteTokenRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/payments': typeof AuthenticatedPaymentsRoute
   '/_authenticated/reminders': typeof AuthenticatedRemindersRoute
+  '/_authenticated/scan': typeof AuthenticatedScanRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
   '/invite/$token': typeof InviteTokenRoute
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/payments'
     | '/reminders'
+    | '/scan'
     | '/settings'
     | '/templates'
     | '/invite/$token'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/payments'
     | '/reminders'
+    | '/scan'
     | '/settings'
     | '/templates'
     | '/invite/$token'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/_authenticated/notifications'
     | '/_authenticated/payments'
     | '/_authenticated/reminders'
+    | '/_authenticated/scan'
     | '/_authenticated/settings'
     | '/_authenticated/templates'
     | '/invite/$token'
@@ -317,6 +329,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRemindersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/scan': {
+      id: '/_authenticated/scan'
+      path: '/scan'
+      fullPath: '/scan'
+      preLoaderRoute: typeof AuthenticatedScanRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -370,6 +389,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedPaymentsRoute: typeof AuthenticatedPaymentsRoute
   AuthenticatedRemindersRoute: typeof AuthenticatedRemindersRoute
+  AuthenticatedScanRoute: typeof AuthenticatedScanRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
   AuthenticatedProofboxesIdRoute: typeof AuthenticatedProofboxesIdRoute
@@ -385,6 +405,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedPaymentsRoute: AuthenticatedPaymentsRoute,
   AuthenticatedRemindersRoute: AuthenticatedRemindersRoute,
+  AuthenticatedScanRoute: AuthenticatedScanRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
   AuthenticatedProofboxesIdRoute: AuthenticatedProofboxesIdRoute,
