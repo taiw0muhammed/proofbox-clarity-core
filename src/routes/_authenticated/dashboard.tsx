@@ -1,11 +1,11 @@
 import { createFileRoute, ClientOnly, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, CheckCircle2, Clock3, FileText, Loader2, Plus } from "lucide-react";
+import { Bell, CalendarDays, CheckCircle2, Clock3, FileText, LayoutTemplate, Loader2, Plus, QrCode, Star } from "lucide-react";
 import { AppShell, PageHeading, SectionHeading } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { EmptyState, ProofBoxCard, StatCard } from "@/components/proofbox-ui";
 import { DashboardCharts } from "@/components/dashboard-charts";
-import { fetchBoxes, toRecord } from "@/lib/proofbox-queries";
+import { fetchBoxesWithState, toRecord } from "@/lib/proofbox-queries";
 import { useProfile, useUser } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -25,7 +25,8 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 function DashboardPage() {
   const { user } = useUser();
   const { data: profile } = useProfile();
-  const { data: boxes, isLoading, error } = useQuery({ queryKey: ["boxes"], queryFn: fetchBoxes });
+  const { data, isLoading, error } = useQuery({ queryKey: ["boxes-with-state"], queryFn: fetchBoxesWithState });
+  const boxes = data?.boxes.filter((box) => !box.userState?.archived_at) ?? [];
 
   const firstName = (profile?.full_name ?? user?.email ?? "there").split(" ")[0];
   const records = (boxes ?? []).map((box) => toRecord(box, user?.id ?? null));
@@ -51,6 +52,8 @@ function DashboardPage() {
         <StatCard label="Completed" value={counts.completed} icon={CheckCircle2} tone="success" />
       </section>
 
+      <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4"><QuickLink to="/proofboxes/create" label="New ProofBox" icon={Plus} /><QuickLink to="/templates" label="Use template" icon={LayoutTemplate} /><QuickLink to="/scan" label="Scan code" icon={QrCode} /><QuickLink to="/reminders" label="Add reminder" icon={CalendarDays} /></section>
+
       {isLoading && <div className="mt-10 flex justify-center"><Loader2 className="size-6 animate-spin text-muted-foreground" /></div>}
       {error && <p className="mt-10 rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">We couldn't load your records. Please refresh and try again.</p>}
 
@@ -60,7 +63,7 @@ function DashboardPage() {
         <section className="mt-9">
           <SectionHeading title="Activity" />
           <ClientOnly fallback={<div className="h-52 rounded-lg border bg-card" />}>
-            <DashboardCharts boxes={boxes ?? []} />
+            <DashboardCharts boxes={boxes} />
           </ClientOnly>
         </section>
       )}
@@ -78,6 +81,9 @@ function DashboardPage() {
           <div className="grid gap-3">{records.slice(0, 6).map((record) => <ProofBoxCard key={record.id} record={record} />)}</div>
         </section>
       )}
+      {boxes.some((box) => box.userState?.starred) && <section className="mt-10"><SectionHeading title="Starred" action={<Star className="size-5 fill-primary text-primary" />} /><div className="grid gap-3">{boxes.filter((box) => box.userState?.starred).slice(0, 4).map((box) => <ProofBoxCard key={box.id} record={toRecord(box, user?.id ?? null)} />)}</div></section>}
     </AppShell>
   );
 }
+
+function QuickLink({ to, label, icon: Icon }: { to: "/proofboxes/create" | "/templates" | "/scan" | "/reminders"; label: string; icon: typeof Plus }) { return <Button asChild variant="outline" className="h-14 justify-start bg-card"><Link to={to}><Icon />{label}</Link></Button>; }

@@ -10,8 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CreateTypeCard, typeChoices } from "@/components/proofbox-ui";
 import { createBox } from "@/lib/proofbox-queries";
+import { getTemplate } from "@/lib/proofbox-templates";
+import { z } from "zod";
 
 export const Route = createFileRoute("/_authenticated/proofboxes/create")({
+  validateSearch: z.object({ template: z.string().optional() }),
   head: () => ({
     meta: [
       { title: "Create a ProofBox" },
@@ -26,7 +29,9 @@ export const Route = createFileRoute("/_authenticated/proofboxes/create")({
 });
 
 function CreatePage() {
-  const [type, setType] = useState("Borrow");
+  const { template: templateSlug } = Route.useSearch();
+  const template = getTemplate(templateSlug);
+  const [type, setType] = useState(template?.type ?? "Borrow");
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -64,15 +69,15 @@ function CreatePage() {
     <AppShell>
       <div className="mx-auto max-w-4xl">
         <Link to="/dashboard" className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"><ArrowLeft className="size-4" />Back</Link>
-        <h1 className="text-2xl font-bold sm:text-3xl">What are you recording?</h1>
-        <p className="mt-2 text-muted-foreground">Choose the closest match, then fill in what was agreed.</p>
+        <h1 className="text-2xl font-bold sm:text-3xl">{template ? `Create a ${template.name} ProofBox` : "What are you recording?"}</h1>
+        <p className="mt-2 text-muted-foreground">{template ? template.description : "Choose the closest match, then fill in what was agreed."}</p>
         <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {typeChoices.map((choice) => <CreateTypeCard key={choice.label} {...choice} selected={type === choice.label} onClick={() => setType(choice.label)} />)}
         </div>
 
         <form onSubmit={onSubmit} className="mt-8 rounded-lg border bg-card p-4 shadow-card sm:p-6">
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field id="title" name="title" label="Record title" placeholder="Camera Borrow" />
+            <Field id="title" name="title" label="Record title" placeholder="Camera Borrow" defaultValue={template?.title} />
             <div>
               <Label htmlFor="amount">Amount or item value</Label>
               <div className="mt-2 flex gap-2">
@@ -89,15 +94,15 @@ function CreatePage() {
             <Field id="due_date" name="due_date" type="date" label="Due or return date" placeholder="" />
             <div className="sm:col-span-2">
               <Label htmlFor="description">What happened?</Label>
-              <Textarea id="description" name="description" className="mt-2 min-h-28" placeholder="I lent Ahmed my camera worth ₦500,000 today." />
+              <Textarea id="description" name="description" defaultValue={template?.details} className="mt-2 min-h-28" placeholder="I lent Ahmed my camera worth ₦500,000 today." />
             </div>
             <div className="sm:col-span-2">
               <Label htmlFor="terms">What was agreed?</Label>
-              <Textarea id="terms" name="terms" className="mt-2 min-h-28" placeholder="Conditions, payment schedule, return date and anything else that should be clear." />
+              <Textarea id="terms" name="terms" defaultValue={template?.terms} className="mt-2 min-h-28" placeholder="Conditions, payment schedule, return date and anything else that should be clear." />
             </div>
             <div className="sm:col-span-2">
               <Label htmlFor="responsibilities">Who is responsible for what?</Label>
-              <Textarea id="responsibilities" name="responsibilities" className="mt-2 min-h-24" placeholder="Ahmed covers any damage. Muhammed provides the charger and bag." />
+              <Textarea id="responsibilities" name="responsibilities" defaultValue={template?.responsibilities} className="mt-2 min-h-24" placeholder="Ahmed covers any damage. Muhammed provides the charger and bag." />
             </div>
           </div>
           <div className="mt-6 flex justify-end">
@@ -109,11 +114,11 @@ function CreatePage() {
   );
 }
 
-function Field({ id, name, label, placeholder, type = "text" }: { id: string; name: string; label: string; placeholder: string; type?: string }) {
+function Field({ id, name, label, placeholder, type = "text", defaultValue }: { id: string; name: string; label: string; placeholder: string; type?: string; defaultValue?: string }) {
   return (
     <div>
       <Label htmlFor={id}>{label}</Label>
-      <Input id={id} name={name} type={type} placeholder={placeholder} className="mt-2 h-11" />
+      <Input id={id} name={name} type={type} placeholder={placeholder} defaultValue={defaultValue} className="mt-2 h-11" />
     </div>
   );
 }

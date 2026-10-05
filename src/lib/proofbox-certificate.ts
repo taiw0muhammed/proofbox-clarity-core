@@ -93,6 +93,27 @@ export async function downloadCertificate(box: FullBox) {
     y += 8;
   }
 
+  const evidence = box.evidence ?? [];
+  if (evidence.length > 0) {
+    heading("Evidence index");
+    for (const item of evidence) row(formatDate(item.created_at), `${item.file_name}${item.description ? ` · ${item.description}` : ""}`);
+    y += 8;
+  }
+
+  const amendments = box.amendments ?? [];
+  if (amendments.length > 0) {
+    heading("Amendments");
+    for (const amendment of amendments) row(formatDateTime(amendment.created_at), amendment.reason);
+    y += 8;
+  }
+
+  const payments = box.payments ?? [];
+  if (payments.length > 0) {
+    heading("Payment records");
+    for (const payment of payments) row(formatDate(payment.payment_date), `${payment.description} · ${formatMoney(payment.amount, box.currency)} · ${payment.status}`);
+    y += 8;
+  }
+
   // Footer
   if (y > 720) { doc.addPage(); y = 64; }
   doc.setDrawColor(...LINE);

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Check, FileDown, Flag, Loader2, MessageSquare, Upload, UserPlus } from "lucide-react";
+import { ArrowLeft, Check, Copy, FileDown, Flag, Loader2, MessageSquare, Upload, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell, SectionHeading } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
@@ -17,15 +17,19 @@ import {
   Timeline,
 } from "@/components/proofbox-ui";
 import { ProofBoxQRCard } from "@/components/proofbox-qr";
+import { ProofBoxProgress } from "@/components/proofbox-progress";
+import { ShareProofBox } from "@/components/share-proofbox";
 import { useUser } from "@/hooks/use-auth";
 import {
   completeBox,
   confirmParticipation,
   disputeBox,
+  duplicateBox,
   evidenceUrl,
   fetchBox,
   inviteParticipant,
   requestChanges,
+  setBoxState,
   uploadEvidence,
 } from "@/lib/proofbox-queries";
 import { downloadCertificate } from "@/lib/proofbox-certificate";
@@ -88,6 +92,7 @@ function DetailPage() {
     act(() => inviteParticipant(id, inviteEmail, "participant", inviteName || inviteEmail), "Invitation added"),
   );
   const uploadMutation = useMutation(act((file: File) => uploadEvidence(id, file, ""), "Evidence added"));
+  const duplicateMutation = useMutation({ mutationFn: () => duplicateBox(box), onSuccess: (copy) => { toast.success("Draft copy created"); void queryClient.invalidateQueries({ queryKey: ["boxes"] }); window.location.assign(`/proofboxes/${copy.id}`); }, onError: (error: Error) => toast.error(error.message) });
 
   if (isLoading) {
     return (
@@ -128,6 +133,9 @@ function DetailPage() {
       detail: event.actor_name ?? "",
       time: formatDateTime(event.created_at),
     }));
+  const download = () => { setDownloading(true); void downloadCertificate(box).then(() => toast.success("Certificate downloaded")).catch(() => toast.error("Could not create the certificate. Please try again.")).finally(() => setDownloading(false)); };
+
+  void setBoxState(id, { starred: false, archived_at: null, last_viewed_at: new Date().toISOString() }).catch(() => undefined);
 
   return (
     <AppShell>
@@ -142,26 +150,14 @@ function DetailPage() {
         <p className="mt-2 font-medium text-muted-foreground">
           {box.amount !== null ? `${formatMoney(box.amount, box.currency)} · ` : ""}{box.code}
         </p>
-        <Button
-          variant="outline"
-          size="sm"
-          className="mt-4"
-          disabled={downloading}
-          onClick={() => {
-            setDownloading(true);
-            downloadCertificate(box)
-              .then(() => toast.success("Certificate downloaded"))
-              .catch(() => toast.error("Could not create the certificate. Please try again."))
-              .finally(() => setDownloading(false));
-          }}
-        >
-          {downloading ? <Loader2 className="animate-spin" /> : <FileDown />}Download certificate
-        </Button>
+        <div className="mt-4 flex flex-wrap gap-2"><Button variant="outline" size="sm" disabled={downloading} onClick={download}>{downloading ? <Loader2 className="animate-spin" /> : <FileDown />}Download certificate</Button><ShareProofBox code={box.code} title={box.title} onDownload={download} /><Button variant="ghost" size="sm" disabled={duplicateMutation.isPending} onClick={() => duplicateMutation.mutate()}><Copy />Duplicate</Button></div>
       </header>
+
+      <div className="mt-7 rounded-lg border bg-card p-4 shadow-card"><ProofBoxProgress status={box.status} /></div>
 
       <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-9">
-          <section>
+          <section id="participants">
             <SectionHeading title="Agreement" />
             <div className="rounded-lg border bg-card px-4 shadow-card sm:px-6"><AgreementRows rows={rows} /></div>
           </section>
