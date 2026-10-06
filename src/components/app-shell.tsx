@@ -10,6 +10,7 @@ import { ProofBoxLogo, ProofBoxMark } from "@/components/proofbox-logo";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { OnboardingDialog } from "@/components/onboarding-dialog";
 
 const nav = [
   { label: "Home", to: "/dashboard", icon: Home },
@@ -39,6 +40,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   };
   return (
     <div className="min-h-screen bg-background">
+      <OnboardingDialog />
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 border-r bg-sidebar lg:flex lg:flex-col">
         <div className="flex h-20 items-center px-6"><Link to="/" aria-label="ProofBox home"><ProofBoxLogo /></Link></div>
         <nav className="flex-1 space-y-1 px-3 py-5" aria-label="Main navigation">

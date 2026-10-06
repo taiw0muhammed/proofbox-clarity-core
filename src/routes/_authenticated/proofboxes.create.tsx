@@ -114,7 +114,7 @@ function CreatePage() {
   );
 }
 
-function Field({ id, name, label, placeholder, type = "text", defaultValue }: { id: string; name: string; label: string; placeholder: string; type?: string; defaultValue?: string }) {
+function Field({ id, name, label, placeholder, type = "text", defaultValue }: { id: string; name: string; label: string; placeholder: string; type?: string; defaultValue?: string | undefined }) {
   return (
     <div>
       <Label htmlFor={id}>{label}</Label>
