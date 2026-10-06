@@ -31,7 +31,10 @@ export function useProfile() {
   const { user } = useUser();
   return useQuery({
     queryKey: ["profile", user?.id],
-    queryFn: () => fetchProfile(user!.id),
+    queryFn: () => {
+      if (!user) throw new Error("You need to be signed in.");
+      return fetchProfile(user.id);
+    },
     enabled: Boolean(user?.id),
   });
 }

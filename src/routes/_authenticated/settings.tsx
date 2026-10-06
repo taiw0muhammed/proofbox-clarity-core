@@ -36,7 +36,7 @@ function SettingsPage() {
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
 
-  const save = async (values: { full_name?: string; notify_confirmations?: boolean; notify_reminders?: boolean; notify_evidence?: boolean }) => {
+  const save = async (values: { full_name?: string; notify_confirmations?: boolean; notify_reminders?: boolean; notify_evidence?: boolean; onboarded?: boolean }) => {
     if (!user) return;
     setBusy(true);
     try {
@@ -115,7 +115,7 @@ function SettingsPage() {
       <section className="mt-9">
         <SectionHeading title="Account" />
         <div className="rounded-lg border bg-card p-4 shadow-card sm:p-6">
-          <Button variant="outline" onClick={() => void signOut()}><LogOut />Sign out</Button>
+          <div className="flex flex-wrap gap-2"><Button variant="outline" onClick={() => void save({ onboarded: false })}>Show getting started</Button><Button variant="outline" onClick={() => void signOut()}><LogOut />Sign out</Button></div>
         </div>
       </section>
     </AppShell>
