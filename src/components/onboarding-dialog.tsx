@@ -27,6 +27,7 @@ export function OnboardingDialog() {
   };
   if (isLoading || !profile || profile.onboarded) return null;
   const current = steps[step];
+  if (!current) return null;
   const Icon = current.icon;
   return <Dialog open><DialogContent className="max-w-md" onInteractOutside={(event) => event.preventDefault()}><DialogHeader><div className="mb-4 flex items-center justify-between"><span className="grid size-11 place-items-center rounded-md bg-primary-soft text-primary"><Icon className="size-5" /></span><span className="text-xs font-semibold text-muted-foreground">{step + 1} of {steps.length}</span></div><DialogTitle className="text-2xl">{current.title}</DialogTitle><DialogDescription className="min-h-16 pt-2 text-sm leading-6">{current.description}</DialogDescription></DialogHeader><div className="flex gap-2" aria-label="Onboarding progress">{steps.map((item, index) => <span key={item.title} className={`h-1.5 flex-1 rounded-full ${index <= step ? "bg-primary" : "bg-secondary"}`} />)}</div><div className="mt-2 flex items-center justify-between gap-3"><Button variant="ghost" disabled={closing} onClick={() => void finish()}>Skip</Button>{step < steps.length - 1 ? <Button onClick={() => setStep((value) => value + 1)}>Continue</Button> : <Button disabled={closing} onClick={() => void finish()}><CalendarDays />Start using ProofBox</Button>}</div></DialogContent></Dialog>;
 }

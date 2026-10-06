@@ -7,4 +7,4 @@
 - [x] Upgrade dashboard with attention, quick actions, starred, and recently viewed sections
 - [x] Add onboarding plus complete empty, loading, error, and mobile states
 - [ ] Complete email notifications — blocked until an owned sender domain is configured
-- [ ] Verify accessibility, responsive layouts, core signed-in flows, and build health
+- [x] Verify accessibility, responsive layouts, core signed-in flows, and build health
