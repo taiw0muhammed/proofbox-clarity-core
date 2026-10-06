@@ -84,6 +84,12 @@ export async function setBoxState(proofBoxId: string, values: Pick<Tables["proof
   return unwrap(await supabase.from("proofbox_user_state").upsert({ user_id: auth.user.id, proof_box_id: proofBoxId, ...values }, { onConflict: "user_id,proof_box_id" }).select().single());
 }
 
+export async function markBoxViewed(proofBoxId: string) {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) return null;
+  return unwrap(await supabase.from("proofbox_user_state").upsert({ user_id: auth.user.id, proof_box_id: proofBoxId, last_viewed_at: new Date().toISOString() }, { onConflict: "user_id,proof_box_id" }).select().single());
+}
+
 export async function duplicateBox(source: FullBox) {
   return createBox({ title: `${source.title} copy`, type: source.type, description: source.description, terms: source.terms, responsibilities: source.responsibilities, amount: source.amount, currency: source.currency, start_date: null, due_date: null, status: "draft" });
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Check, Copy, FileDown, Flag, Loader2, MessageSquare, Upload, UserPlus } from "lucide-react";
@@ -28,8 +28,8 @@ import {
   evidenceUrl,
   fetchBox,
   inviteParticipant,
+  markBoxViewed,
   requestChanges,
-  setBoxState,
   uploadEvidence,
 } from "@/lib/proofbox-queries";
 import { downloadCertificate } from "@/lib/proofbox-certificate";
@@ -92,7 +92,9 @@ function DetailPage() {
     act(() => inviteParticipant(id, inviteEmail, "participant", inviteName || inviteEmail), "Invitation added"),
   );
   const uploadMutation = useMutation(act((file: File) => uploadEvidence(id, file, ""), "Evidence added"));
-  const duplicateMutation = useMutation({ mutationFn: () => duplicateBox(box), onSuccess: (copy) => { toast.success("Draft copy created"); void queryClient.invalidateQueries({ queryKey: ["boxes"] }); window.location.assign(`/proofboxes/${copy.id}`); }, onError: (error: Error) => toast.error(error.message) });
+  const duplicateMutation = useMutation({ mutationFn: () => { if (!box) throw new Error("This ProofBox is unavailable."); return duplicateBox(box); }, onSuccess: (copy) => { toast.success("Draft copy created"); void queryClient.invalidateQueries({ queryKey: ["boxes"] }); window.location.assign(`/proofboxes/${copy.id}`); }, onError: (error: Error) => toast.error(error.message) });
+
+  useEffect(() => { void markBoxViewed(id).catch(() => undefined); }, [id]);
 
   if (isLoading) {
     return (
@@ -134,8 +136,6 @@ function DetailPage() {
       time: formatDateTime(event.created_at),
     }));
   const download = () => { setDownloading(true); void downloadCertificate(box).then(() => toast.success("Certificate downloaded")).catch(() => toast.error("Could not create the certificate. Please try again.")).finally(() => setDownloading(false)); };
-
-  void setBoxState(id, { starred: false, archived_at: null, last_viewed_at: new Date().toISOString() }).catch(() => undefined);
 
   return (
     <AppShell>
